@@ -1,0 +1,12 @@
+Plot dicoCouleur Settled 0.0 1.0 0.720059
+Plot dicoCouleur II 1.0 0.729947 0.0
+Plot dicoCouleur IV 0.0 0.670004 0.0
+Plot dicoCouleur MobilePicking 0.540105 0.810035 0.900012
+Plot dicoCouleur SettledPicking 0.700037 0.900012 0.739958
+Plot dicoCouleur Picking 0.900012 0.835063 0.816506
+Plot dicoCouleur I 0.450006 0.0 0.0
+Plot dicoCouleur III 1.0 1.0 0.0
+Plot dicoCouleur hotPlot 1.0 0.0 0.0
+User VectorialElementaryPOV User 0.600049 0.900012 0.0 0.0 0.0 0.0 1 1 random #(4.45856e-7@-10.2 8.83346@-5.1 8.83346@5.1 -1.21634e-7@10.2 -8.83346@5.1 -8.83346@-5.1 3.44522e-6@-10.2) 
+RessProvider VectorialElementaryPOV povRemainRess 0.0 0.0 1.0 0.0 0.0 0.0 1 1 random #(4.45856e-7@-10.2 8.83346@-5.1 8.83346@5.1 -1.21634e-7@10.2 -8.83346@5.1 -8.83346@-5.1 3.44522e-6@-10.2) 
+RessProvider VectorialElementaryPOV RessProvider 0.0 0.0 1.0 0.0 0.0 0.0 1 1 random #(4.45856e-7@-10.2 8.83346@-5.1 8.83346@5.1 -1.21634e-7@10.2 -8.83346@5.1 -8.83346@-5.1 3.44522e-6@-10.2) 
