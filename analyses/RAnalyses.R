@@ -16,15 +16,19 @@ r <- openModel("WitUses", parcelFile="WitUses.pcl")
 # Set the basic init and step method
 r <- setInit("init") # Initialization choice
 r <- setStep("step:") # Scenario choice
-#choose the probe to activate during the simulation
-r<- activateProbe("sumCapitalOfUsers", "WitUses")
 
 resPlan <- c()
 ## Set the value of attribute
-for (ressCoefValue in (1:2)/10) {
-r <- setNumericAttributeValue("ressCoef",
-                              "Calibration class",
-                              ressCoefValue)
+for (  ressTappingMobileValue in (1:2)/10) {
+#choose the probe to activate during the simulation
+r<- activateProbe("satisfiedUsers", "WitUses")
+r <- setNumericAttributeValue("ressTapping",
+                              "MobileUse class",
+                              ressTappingValue)
+for (  ressTappingSettledValue in (1:2)/10) {
+r <- setNumericAttributeValue("ressTapping",
+                              "SettledUse class",
+                              ressTappingValue)}
 ####### Initialize the Cormas model #######
 r <- initSimu()
 
