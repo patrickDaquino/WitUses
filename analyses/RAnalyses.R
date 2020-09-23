@@ -18,9 +18,10 @@ r <- setInit("init") # Initialization choice
 r <- setStep("step:") # Scenario choice
 
 resPlan <- NULL
+resPlanBig <- NULL
 ## Set the value of attribute
-for (  ressTappingMobileValue in (1:2)/10) {
-for (  ressTappingSettledValue in (1:2)/10) {
+for (  ressTappingMobileValue in c(0.1,0.5,1)) {
+for (  ressTappingSettledValue in c(0.1,0.5,1)) {
   #choose the probe to activate during the simulation
   r<- activateProbe("satisfiedUsers", "Observer")
 
@@ -34,11 +35,15 @@ for (  ressTappingSettledValue in (1:2)/10) {
 r <- initSimu()
 
 ####### Run Simulation #######
-runSimu(20)
+R <- runSimu(20)
 
 ### Get results ####
 res <- getNumericProbe("satisfiedUsers", "Observer")
 resPlan <- rbind(resPlan, c(ressTappingMobileValue, 
                             ressTappingSettledValue,
-                            res[20]))
+                            res$satisfiedUsers[21]))
+res$ressTappingMobile <- ressTappingMobileValue
+res$ressTappingSettled <- ressTappingSettledValue
+resPlanBig <- rbind(resPlanBig, res)
 }}
+
