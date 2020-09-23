@@ -190,11 +190,24 @@ return(askCormas("GetProbeOfClass",
 #' @return The set of values saved for the selected probe
 
 
-getNumericProbe <- function(probeName, className){
+getNumericProbe <- function(probeName, className, level = "global"){
  answer <- getProbe(probeName, className)[[2]]
  res <- xml_double(xml_contents(xml_find_all(content(answer),
 			xpath="//*/ns:result/*")))
-	return(res)
+ if (level != "global") {
+   ids <- getAttributesOfEntities("id", className)
+   ids <- ids$id
+   res <- matrix(data=res, 
+                 ncol = length(ids), 
+                 nrow = length(res) / length(ids),
+                 byrow = F)
+   duration <- (length(res) / length(ids))
+   colnames(res) <- paste(className,ids, sep="_")
+ } else {
+   res <- cbind(res, 1:length(res))
+   colnames(res) <- c(probeName, "t")
+ }
+	return(res %>% as.data.frame() %>% mutate(t = row_number()))
 }
 
 #' setNumericAttributeValue function
