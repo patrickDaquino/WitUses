@@ -68,3 +68,9 @@ resPlanBig %>%
   geom_line(aes(y=satisfiedUsers, x=t)) +
   facet_grid(ressTappingMobile ~ ressTappingSettled)
 
+write.table(x=resPlanBig,
+            file = "simulation-results.csv",
+            sep = ";",
+            dec = ".",
+            row.names = F)
+
