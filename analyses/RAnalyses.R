@@ -4,8 +4,8 @@ library(tidyr)
 library(ggplot2)
 
 # set working directory
-#setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
-setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
+setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
+#setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
 
 #load functions to interact with cormas
 source("cormas-func.R")
@@ -22,12 +22,12 @@ resPlan <- c()
 for (  ressTappingMobileValue in (1:2)/10) {
 #choose the probe to activate during the simulation
 r<- activateProbe("satisfiedUsers", "WitUses")
-r <- setNumericAttributeValue("ressTapping",
-                              "MobileUse class",
+r <- setNumericAttributeValue("ressTappingFromR",
+                              "MobileUse",
                               ressTappingValue)
 for (  ressTappingSettledValue in (1:2)/10) {
-r <- setNumericAttributeValue("ressTapping",
-                              "SettledUse class",
+r <- setNumericAttributeValue("ressTappingFromR",
+                              "SettledUse",
                               ressTappingValue)}
 ####### Initialize the Cormas model #######
 r <- initSimu()
