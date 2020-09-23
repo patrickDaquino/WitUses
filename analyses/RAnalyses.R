@@ -17,18 +17,19 @@ r <- openModel("WitUses", parcelFile="WitUses.pcl")
 r <- setInit("init") # Initialization choice
 r <- setStep("step:") # Scenario choice
 
-resPlan <- c()
+resPlan <- NULL
 ## Set the value of attribute
 for (  ressTappingMobileValue in (1:2)/10) {
-#choose the probe to activate during the simulation
-r<- activateProbe("satisfiedUsers", "WitUses")
-r <- setNumericAttributeValue("ressTappingFromR",
-                              "MobileUse",
-                              ressTappingValue)
 for (  ressTappingSettledValue in (1:2)/10) {
-r <- setNumericAttributeValue("ressTappingFromR",
+  #choose the probe to activate during the simulation
+  r<- activateProbe("satisfiedUsers", "Observer")
+
+  r <- setNumericAttributeValue("ressTappingFromR",
+                                "MobileUse",
+                                ressTappingMobileValue)
+  r <- setNumericAttributeValue("ressTappingFromR",
                               "SettledUse",
-                              ressTappingValue)}
+                              ressTappingSettledValue)
 ####### Initialize the Cormas model #######
 r <- initSimu()
 
@@ -36,6 +37,8 @@ r <- initSimu()
 runSimu(20)
 
 ### Get results ####
-res <- getNumericProbe("sumCapitalOfUsers", "WitUses")
-resPlan <- c(resPlan, res[20])
-}
+res <- getNumericProbe("satisfiedUsers", "Observer")
+resPlan <- rbind(resPlan, c(ressTappingMobileValue, 
+                            ressTappingSettledValue,
+                            res[20]))
+}}
