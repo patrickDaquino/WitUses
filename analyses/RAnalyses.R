@@ -4,8 +4,8 @@ library(tidyr)
 library(ggplot2)
 
 # set working directory
-setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
-#setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
+#setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
+setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
 
 #load functions to interact with cormas
 source("cormas-func.R")
