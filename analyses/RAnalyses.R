@@ -20,11 +20,11 @@ r <- setStep("step:") # Scenario choice
 resPlan <- NULL
 resPlanBig <- NULL
 
-rTMValues <- c(0.1, 1)
-rTSValues <- c(0.1 ,1)
+rTMValues <- c(0.3, 0.35, 0.4, 0.45, 0.5)
+rTSValues <- c(0.4, 0.45, 0.5 ,0.55, 0.6)
 
-simuDuration <- 20
-nbReplication <- 5
+simuDuration <- 200
+nbReplication <- 10
 
 expPlanProgress <- txtProgressBar(min = 1,
                                max = length(rTMValues) * length(rTMValues) * nbReplication,
