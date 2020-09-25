@@ -46,10 +46,10 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 # Defining a fitness function
 nbReplication = 5
 fitness <- function(genes, 
-                    nbReplication = nbReplication, 
+                    nbRep = nbReplication, 
                     simDuration = 50) {
   sUs <- NULL
-  for (replicate in 1:nbReplication) {
+  for (replicate in 1:nbRep) {
     sUs <- c(sUs, simulateWitUsesModel(genes$rTM, genes$rTS, genes$rTP, simDuration))
   }
   return(c(mean(sUs) , sd(sUs)))
@@ -59,7 +59,7 @@ resPlan <- NULL
 resPlanBig <- NULL
 
 #Definition de pla population initiale
-popSize <- 5
+popSize <- 10
 pop <- data.frame(rTM = runif(popSize), # (Choose randomly a nb in ]0:1[)
                   rTS  = runif(popSize), 
                   rTP = runif(popSize),
@@ -83,7 +83,7 @@ for (generation in 1:numberOfGenerations){
   setTxtProgressBar(expPlanProgress, generation)
   # Compute fitness for each individual
   for (i in 1:length(pop)) {
-    fit <- fitness(pop[i,])
+    fit <- fitness(genes = pop[i,])
     pop$fitnessA[i] <- fit[1]
     pop$fitnessB[i] <- fit[2]
   }
@@ -136,7 +136,6 @@ allPops %>%
  
 # Notes from the file 
   # Natural selection: pop$fitnessA <- maxmean(sUs), pop$fitnessB <-minsd(sUs)
-  
   # Mutations : rTMValues <- c(0,1) rTSValues <- c(0,1) rTPValues <- c(0,1)
   
 
