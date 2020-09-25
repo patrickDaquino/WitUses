@@ -4,8 +4,8 @@ library(tidyr)
 library(ggplot2)
 
 # set working directory
-#setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
-setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
+setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
+#setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
 
 #load functions to interact with cormas
 source("cormas-func.R")
@@ -58,13 +58,9 @@ fitness <- function(genes,
 resPlan <- NULL
 resPlanBig <- NULL
 
-rTMValues <- c(0,1)
-rTSValues <- c(0,1)
-rTPValues <- c(0,1)
-
 #Definition de pla population initiale
 popSize <- 5
-pop <- data.frame(rTM = runif(popSize),
+pop <- data.frame(rTM = runif(popSize), # (Choose randomly a nb in ]0:1[)
                   rTS  = runif(popSize), 
                   rTP = runif(popSize),
                   fitnessA = NA,
@@ -72,19 +68,20 @@ pop <- data.frame(rTM = runif(popSize),
   tbl_df()
 
 # decompte de l'exectution du plan d'expérience
-simuNb <- 0
-maxPopulationNumber <- 20
-maxSImNumber <- maxPopulationNumber * length(pop) * nbReplication
+
+numberOfGenerations <- 20
+
 expPlanProgress <- txtProgressBar(min = 1,
-                               max = maxSImNumber,
+                               max = numberOfGenerations,
                                style = 3)
 
 # exectution de l'algo génétique
 allPops <- pop
 allPops$generation <- 0
 
-for (generation in 1:maxPopulationNumber){
-  # Compute fitness
+for (generation in 1:numberOfGenerations){
+  setTxtProgressBar(expPlanProgress, generation)
+  # Compute fitness for each individual
   for (i in 1:length(pop)) {
     fit <- fitness(pop[i,])
     pop$fitnessA[i] <- fit[1]
@@ -125,92 +122,22 @@ for (generation in 1:maxPopulationNumber){
   allPops <- allPops %>%
     union(pop)
   pop <- newPop
-  
+
+  #Plot Advances
+allPops %>% 
+ 	gather("indicator", "value", -generation) %>%
+	mutate(generation = as.factor(generation)) %>%
+	ggplot() +
+	geom_boxplot(aes(x = generation,
+	 y = value, 
+	color = indicator))
 }
 
  
-
-## Set the value of attribute
-for (ressTappingMobileValue in rTMValues) {
-for (ressTappingSettledValue in rTSValues) {
-  for (replicate in 1:nbReplication) {
-    simuNb <- simuNb + 1
-    setTxtProgressBar(expPlanProgress, simuNb)
+# Notes from the file 
+  # Natural selection: pop$fitnessA <- maxmean(sUs), pop$fitnessB <-minsd(sUs)
   
+  # Mutations : rTMValues <- c(0,1) rTSValues <- c(0,1) rTPValues <- c(0,1)
   
-  getAttributesOfEntities("capital", "User")
-  
-  resPlan <- rbind(resPlan, c(ressTappingMobileValue, 
-                            ressTappingSettledValue,
-                            simuNb,
-                            lastNbSatisfiedUsers))
-  
-  res$ressTappingMobile <- ressTappingMobileValue
-  res$ressTappingSettled <- ressTappingSettledValue
-  res$simuNb <- simuNb
-  resPlanBig <- rbind(resPlanBig, res)
-  }
-}}
 
-colnames(resPlan) <- c("ressTappingMobile",
-                       "ressTappingSettled",
-                       "simuNb",
-                       "satisfiedUsers")
-
-resPlanBig %>% 
-  tbl_df()
-
-resPlanBig %>% 
-  mutate(repNb = as.factor(simuNb %/% (length(rTMValues) * length(rTMValues)))) %>%
-  ggplot() +
-  geom_line(aes(y=satisfiedUsers, 
-                x=t, 
-                color = repNb, 
-                group = simuNb)) +
-  facet_grid(ressTappingMobile ~ ressTappingSettled, 
-             labeller = label_both)
-
-resPlanBig %>% 
-  tbl_df() %>% 
-  group_by(ressTappingMobile,
-           ressTappingSettled,
-           t) %>%
-  summarise(expectedSatisfiedUsers = mean(satisfiedUsers),
-            sdSatisfiedUsers = sd(satisfiedUsers)) %>%
-  ggplot() +
-  geom_line(aes(y=expectedSatisfiedUsers, 
-                x=t)) +
-  facet_grid(ressTappingMobile ~ ressTappingSettled, 
-             labeller = label_both)
-
-resPlan %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_boxplot(aes(y = satisfiedUsers)) +
-  facet_grid(ressTappingMobile ~ ressTappingSettled, 
-               labeller = label_both) + 
-    ggsave("graphique-traj-moyennes.pdf", 
-           width = 15, 
-           height = 15, 
-           units = "cm")
-  
-resPlan %>%
-  as.data.frame() %>% 
-  group_by(ressTappingMobile,
-           ressTappingSettled) %>%
-  summarise(expectedSatisfiedUsers = mean(satisfiedUsers)) %>%
-  ggplot() +
-  geom_tile(aes(fill = expectedSatisfiedUsers, 
-                y = ressTappingMobile, 
-                x = ressTappingSettled)) + 
-  ggsave("graphique3D.pdf", 
-         width = 15, 
-         height = 15, 
-         units = "cm")
-
-write.table(x=resPlanBig,
-            file = "simulation-results.csv",
-            sep = ";",
-            dec = ".",
-            row.names = F)
 
