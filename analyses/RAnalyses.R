@@ -44,10 +44,10 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 }
 
 # Defining a fitness function
-nbReplication = 5
+nbReplication = 2
 fitness <- function(genes, 
                     nbRep = nbReplication, 
-                    simDuration = 50) {
+                    simDuration = 15) {
   sUs <- NULL
   for (replicate in 1:nbRep) {
     sUs <- c(sUs, simulateWitUsesModel(genes$rTM, genes$rTS, genes$rTP, simDuration))
@@ -59,10 +59,10 @@ resPlan <- NULL
 resPlanBig <- NULL
 
 #Definition de pla population initiale
-popSize <- 10
-pop <- data.frame(rTM = runif(popSize), # (Choose randomly a nb in ]0:1[)
-                  rTS  = runif(popSize), 
-                  rTP = runif(popSize),
+popSize <- 5
+pop <- data.frame(rTM = runif(popSize, min = 0.2, max = 0.6), # (Choose randomly a nb in ]0:1[)
+                  rTS  = runif(popSize, min = 0.2, max = 0.6), 
+                  rTP = runif(popSize, min = 0.2, max = 0.6),
                   fitnessA = NA,
                   fitnessB = NA) %>%
   tbl_df()
@@ -76,8 +76,7 @@ expPlanProgress <- txtProgressBar(min = 1,
                                style = 3)
 
 # exectution de l'algo génétique
-allPops <- pop
-allPops$generation <- 0
+allPops <- NULL
 
 for (generation in 1:numberOfGenerations){
   setTxtProgressBar(expPlanProgress, generation)
@@ -91,52 +90,60 @@ for (generation in 1:numberOfGenerations){
   bestA <- max(pop$fitnessA)
   bestB <- min(pop$fitnessB)
   newPop <- pop %>% 
-     mutate(alive = (fitnessA > bestA - 0.1) & 
-            (fitnessB < bestB + 0.1)) %>%
+     mutate(alive = (fitnessA > (bestA - 1)) & 
+            (fitnessB < (bestB + 1))) %>%
     filter(alive) %>%
-    select(- fitnessA, - fitnessB)
+    select(- fitnessA, - fitnessB, -alive)
 
-  # reproduction
+  # Reproduction
   child <- data.frame(rTM = NA,
                       rTS  = NA, 
                       rTP = NA)
   while(dim(newPop)[1] < popSize ) {
-    parents <- pop %>% sample_n(2)
+    parents <- newPop %>% sample_n(2,replace = T)
     child$rTM <- parents$rTM[1]
     child$rTS <- parents$rTS[2]
     child$rTP <- parents$rTP[sample(c(1,2),1)]
     newPop <- newPop %>%
-      union(child)
+      bind_rows(child)
   }
   
   # Mutation
   newPop <- newPop %>% 
     select(starts_with("rT")) %>%
     rowwise() %>%
-    mutate_all(~rnorm(1,.,sd = 0.1)) %>%
+    mutate_all(~rnorm(1,.,sd = 0.01)) %>%
+    mutate(rTM = max(rTM,0)) %>%
+    mutate(rTS = max(rTS,0)) %>%
+    mutate(rTP = max(rTP,0)) %>%
     mutate(fitnessA = NA, 
            fitnessB = NA)
   
-  #Update Population
+  # Update Population
   pop$generation <- generation
+  if (is.null(allPops)) {
+    allPops <- pop
+  } else {
   allPops <- allPops %>%
     union(pop)
-  pop <- newPop
+  }
 
-  #Plot Advances
+  # Plot Advances
 allPops %>% 
+  select(generation, fitnessA, fitnessB) %>%
  	gather("indicator", "value", -generation) %>%
 	mutate(generation = as.factor(generation)) %>%
 	ggplot() +
 	geom_boxplot(aes(x = generation,
 	 y = value, 
 	color = indicator))
+  
+  # Update actual population
+  pop <- newPop
 }
 
- 
-# Notes from the file 
-  # Natural selection: pop$fitnessA <- maxmean(sUs), pop$fitnessB <-minsd(sUs)
-  # Mutations : rTMValues <- c(0,1) rTSValues <- c(0,1) rTPValues <- c(0,1)
   
+  
+    
 
 
