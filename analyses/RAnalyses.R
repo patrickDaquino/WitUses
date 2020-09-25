@@ -63,9 +63,10 @@ rTSValues <- c(0,1)
 rTPValues <- c(0,1)
 
 #Definition de pla population initiale
-pop <- data.frame(rTM = runif(5),
-                  rTS  = runif(5), 
-                  rTP = runif(5),
+popSize <- 5
+pop <- data.frame(rTM = runif(popSize),
+                  rTS  = runif(popSize), 
+                  rTP = runif(popSize),
                   fitnessA = NA,
                   fitnessB = NA) %>%
   tbl_df()
@@ -89,9 +90,41 @@ for (generation in 1:maxPopulationNumber){
     pop$fitnessA[i] <- fit[1]
     pop$fitnessB[i] <- fit[2]
   }
-  # Natural selection
+  # Natural selection (les solutions dominées meurent)
+  bestA <- max(pop$fitnessA)
+  bestB <- min(pop$fitnessB)
+  newPop <- pop %>% 
+     mutate(alive = (fitnessA > bestA - 0.1) & 
+            (fitnessB < bestB + 0.1)) %>%
+    filter(alive) %>%
+    select(- fitnessA, - fitnessB)
+
+  # reproduction
+  child <- data.frame(rTM = NA,
+                      rTS  = NA, 
+                      rTP = NA)
+  while(dim(newPop)[1] < popSize ) {
+    parents <- pop %>% sample_n(2)
+    child$rTM <- parents$rTM[1]
+    child$rTS <- parents$rTS[2]
+    child$rTP <- parents$rTP[sample(c(1,2),1)]
+    newPop <- newPop %>%
+      union(child)
+  }
   
-  # Mutations
+  # Mutation
+  newPop <- newPop %>% 
+    select(starts_with("rT")) %>%
+    rowwise() %>%
+    mutate_all(~rnorm(1,.,sd = 0.1)) %>%
+    mutate(fitnessA = NA, 
+           fitnessB = NA)
+  
+  #Update Population
+  pop$generation <- generation
+  allPops <- allPops %>%
+    union(pop)
+  pop <- newPop
   
 }
 
