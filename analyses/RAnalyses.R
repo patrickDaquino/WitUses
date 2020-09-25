@@ -89,17 +89,17 @@ for (generation in 1:maxPopulationNumber){
     pop$fitnessA[i] <- fit[1]
     pop$fitnessB[i] <- fit[2]
   }
-  # Natural selection
+  # Natural selection: pop$fitnessA <- maxmean(sUs), pop$fitnessB <-minsd(sUs)
   
-  # Mutations
+  # Mutations : rTMValues <- c(0,1) rTSValues <- c(0,1) rTPValues <- c(0,1)
   
 }
 
  
 
 ## Set the value of attribute
-for (ressTappingMobileValue in rTMValues) {
-for (ressTappingSettledValue in rTSValues) {
+for (needRSMobileValue in RSMValues) {
+for (needRSSettledValue in RSSValues) {
   for (replicate in 1:nbReplication) {
     simuNb <- simuNb + 1
     setTxtProgressBar(expPlanProgress, simuNb)
@@ -107,20 +107,20 @@ for (ressTappingSettledValue in rTSValues) {
   
   getAttributesOfEntities("capital", "User")
   
-  resPlan <- rbind(resPlan, c(ressTappingMobileValue, 
-                            ressTappingSettledValue,
+  resPlan <- rbind(resPlan, c(needRSMobileValue, 
+                              needRSSettledValue,
                             simuNb,
                             lastNbSatisfiedUsers))
   
-  res$ressTappingMobile <- ressTappingMobileValue
-  res$ressTappingSettled <- ressTappingSettledValue
+  res$needRSMobile <- needRSMobileValue
+  res$needRSSettled <- needRSSettledValue
   res$simuNb <- simuNb
   resPlanBig <- rbind(resPlanBig, res)
   }
 }}
 
-colnames(resPlan) <- c("ressTappingMobile",
-                       "ressTappingSettled",
+colnames(resPlan) <- c("needRSMobile",
+                       "needRSSettled",
                        "simuNb",
                        "satisfiedUsers")
 
@@ -134,20 +134,20 @@ resPlanBig %>%
                 x=t, 
                 color = repNb, 
                 group = simuNb)) +
-  facet_grid(ressTappingMobile ~ ressTappingSettled, 
+  facet_grid(needRSMobile ~ needRSSettled, 
              labeller = label_both)
 
 resPlanBig %>% 
   tbl_df() %>% 
-  group_by(ressTappingMobile,
-           ressTappingSettled,
+  group_by(needRSMobile,
+           needRSSettled,
            t) %>%
   summarise(expectedSatisfiedUsers = mean(satisfiedUsers),
             sdSatisfiedUsers = sd(satisfiedUsers)) %>%
   ggplot() +
   geom_line(aes(y=expectedSatisfiedUsers, 
                 x=t)) +
-  facet_grid(ressTappingMobile ~ ressTappingSettled, 
+  facet_grid(needRSMobile ~ needRSSettled, 
              labeller = label_both)
 
 resPlan %>%
@@ -163,8 +163,8 @@ resPlan %>%
   
 resPlan %>%
   as.data.frame() %>% 
-  group_by(ressTappingMobile,
-           ressTappingSettled) %>%
+  group_by(needRSMobile,
+           needRSSettled) %>%
   summarise(expectedSatisfiedUsers = mean(satisfiedUsers)) %>%
   ggplot() +
   geom_tile(aes(fill = expectedSatisfiedUsers, 
