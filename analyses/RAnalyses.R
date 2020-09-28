@@ -4,8 +4,8 @@ library(tidyr)
 library(ggplot2)
 
 # set working directory
-setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
-#setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
+#setwd("~/vw7.6ncnovo/cormas2020/Models/WitUses/analyses")
+setwd("C:/vw7.6nc/cormas2020/Models/WitUses/analyses")
 
 #load functions to interact with cormas
 source("cormas-func.R")
@@ -44,10 +44,10 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 }
 
 # Defining a fitness function
-nbReplication = 2
+nbReplication = 10
 fitness <- function(genes, 
                     nbRep = nbReplication, 
-                    simDuration = 15) {
+                    simDuration = 200) {
   sUs <- NULL
   for (replicate in 1:nbRep) {
     sUs <- c(sUs, simulateWitUsesModel(genes$rTM, genes$rTS, genes$rTP, simDuration))
@@ -59,10 +59,10 @@ resPlan <- NULL
 resPlanBig <- NULL
 
 #Definition de pla population initiale
-popSize <- 5
-pop <- data.frame(rTM = runif(popSize, min = 0.2, max = 0.6), # (Choose randomly a nb in ]0:1[)
-                  rTS  = runif(popSize, min = 0.2, max = 0.6), 
-                  rTP = runif(popSize, min = 0.2, max = 0.6),
+popSize <- 10
+pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly a nb in ]0:1[)
+                  rTS  = runif(popSize, min = 0.3, max = 0.6), 
+                  rTP = runif(popSize, min = 0.2, max = 0.4),
                   fitnessA = NA,
                   fitnessB = NA) %>%
   tbl_df()
