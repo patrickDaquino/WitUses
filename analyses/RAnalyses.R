@@ -44,10 +44,10 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 }
 
 # Defining a fitness function
-nbReplication = 8
+nbReplication = 2
 fitness <- function(genes, 
                     nbRep = nbReplication, 
-                    simDuration = 150) {
+                    simDuration = 75) {
   sUs <- NULL
   for (replicate in 1:nbRep) {
     sUs <- c(sUs, simulateWitUsesModel(genes$rTM, 
@@ -62,7 +62,7 @@ resPlan <- NULL
 resPlanBig <- NULL
 
 #Definition de pla population initiale
-popSize <- 20
+popSize <- 5
 pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly a nb in ]0:1[)
                   rTS  = runif(popSize, min = 0.3, max = 0.6), 
                   rTP = runif(popSize, min = 0.2, max = 0.4),
@@ -72,7 +72,7 @@ pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly
 
 # decompte de l'exectution du plan d'expérience
 
-numberOfGenerations <- 10
+numberOfGenerations <- 3
 
 expPlanProgress <- txtProgressBar(min = 1,
                                max = numberOfGenerations,
@@ -90,15 +90,22 @@ for (generation in 1:numberOfGenerations){
     pop$fitnessB[i] <- fit[2]
   }
   # Natural selection (les solutions dominées meurent)
-  bestA <- max(pop$fitnessA, na.rm = T)
-  bestB <- min(pop$fitnessB, na.rm = T)
-  sdA <- sd(pop$fitnessA, na.rm = T)
-  sdB <- sd(pop$fitnessB, na.rm = T)
+  #bestA <- max(pop$fitnessA, na.rm = T)
+  #bestB <- min(pop$fitnessB, na.rm = T)
+  #sdA <- sd(pop$fitnessA, na.rm = T)
+  #sdB <- sd(pop$fitnessB, na.rm = T)
+  minFit <- pop %>% 
+    mutate(fit = fitnessA - fitnessB) %>%
+    summarise(med = median(fit)) %>%
+    pull(med) %>%
+    unique()
   newPop <- pop %>% 
-     mutate(alive = (fitnessA > (bestA - sdA)) & 
-            (fitnessB < (bestB + sdB))) %>%
+     #mutate(alive = (fitnessA > (bestA - sdA)) & 
+            #(fitnessB < (bestB + sdB))) %>%
+    mutate(fit = fitnessA - fitnessB) %>%
+    mutate(alive = (fit >= minFit)) %>%
     filter(alive) %>%
-    select(- fitnessA, - fitnessB, -alive)
+    select(- fitnessA, - fitnessB, -alive, -fit)
 
   # Reproduction
   while(dim(newPop)[1] < popSize ) {
@@ -122,9 +129,7 @@ for (generation in 1:numberOfGenerations){
       mutate_all(~rnorm(1,.,sd = 0.01)) %>%
       mutate(rTM = max(rTM,0)) %>%
       mutate(rTS = max(rTS,0)) %>%
-      mutate(rTP = max(rTP,0)) %>%
-      mutate(fitnessA = NA, 
-             fitnessB = NA)
+      mutate(rTP = max(rTP,0))
     
     newPop <- newPop %>%
       bind_rows(child)
