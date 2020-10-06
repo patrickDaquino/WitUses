@@ -13,7 +13,7 @@ source("cormas-func.R")
 #Open model
 r <- openModel("WitUses", parcelFile="WitUses.pcl")
 
-# Defining a simple simulateModel function
+  # Defining a simple simulateModel function
 # Supose that the modele is loaded and init and step method are choosen
 simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
   
@@ -44,7 +44,7 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 }
 
 # Defining a fitness function
-nbReplication = 2
+nbReplication = 4
 fitness <- function(genes, 
                     nbRep = nbReplication, 
                     simDuration = 75) {
@@ -62,7 +62,7 @@ resPlan <- NULL
 resPlanBig <- NULL
 
 #Definition de pla population initiale
-popSize <- 5
+popSize <- 8
 pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly a nb in ]0:1[)
                   rTS  = runif(popSize, min = 0.3, max = 0.6), 
                   rTP = runif(popSize, min = 0.2, max = 0.4),
@@ -72,7 +72,7 @@ pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly
 
 # decompte de l'exectution du plan d'expérience
 
-numberOfGenerations <- 3
+numberOfGenerations <- 5
 
 expPlanProgress <- txtProgressBar(min = 1,
                                max = numberOfGenerations,
@@ -90,18 +90,13 @@ for (generation in 1:numberOfGenerations){
     pop$fitnessB[i] <- fit[2]
   }
   # Natural selection (les solutions dominées meurent)
-  #bestA <- max(pop$fitnessA, na.rm = T)
-  #bestB <- min(pop$fitnessB, na.rm = T)
-  #sdA <- sd(pop$fitnessA, na.rm = T)
-  #sdB <- sd(pop$fitnessB, na.rm = T)
   minFit <- pop %>% 
     mutate(fit = fitnessA - fitnessB) %>%
     summarise(med = median(fit)) %>%
     pull(med) %>%
     unique()
+  
   newPop <- pop %>% 
-     #mutate(alive = (fitnessA > (bestA - sdA)) & 
-            #(fitnessB < (bestB + sdB))) %>%
     mutate(fit = fitnessA - fitnessB) %>%
     mutate(alive = (fit >= minFit)) %>%
     filter(alive) %>%
@@ -154,13 +149,16 @@ allPops %>%
 	 y = value, 
 	color = indicator)) +
   ggsave("suivi-algo.pdf")
-  
-  # Update actual population
+
+# Update actual population
   pop <- newPop
 }
 
-  
-  
+allPops %>% 
+  write.table("res-algo.csv",
+              row.names = F,
+              sep="\t",
+              dec= ".")
     
 
 
