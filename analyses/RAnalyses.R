@@ -44,10 +44,10 @@ simulateWitUsesModel <- function(rTM, rTS, rTP, duration) {
 }
 
 # Defining a fitness function
-nbReplication = 5
+nbReplication = 8
 fitness <- function(genes, 
                     nbRep = nbReplication, 
-                    simDuration = 75) {
+                    simDuration = 150) {
   sUs <- NULL
   for (replicate in 1:nbRep) {
     sUs <- c(sUs, simulateWitUsesModel(genes$rTM, 
@@ -72,7 +72,7 @@ pop <- data.frame(rTM = runif(popSize, min = 0.3, max = 0.5), # (Choose randomly
 
 # decompte de l'exectution du plan d'expérience
 
-numberOfGenerations <- 5
+numberOfGenerations <- 10
 
 expPlanProgress <- txtProgressBar(min = 1,
                                max = numberOfGenerations,
@@ -106,7 +106,7 @@ for (generation in 1:numberOfGenerations){
                         rTS  = NA, 
                         rTP = NA)
     protoParents <- pop %>% 
-      mutate(fitLevel = (fitnessA / fitnessB))
+      mutate(fitLevel = (fitnessA - fitnessB))
     popFitLevel <- sum(protoParents$fitLevel, na.rm = T)
     parents <- protoParents %>% 
       mutate(proba = fitLevel / popFitLevel) %>%
